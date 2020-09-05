@@ -13,13 +13,13 @@ import lejos.robotics.subsumption.Behavior;
 import org.lejos.ev3.robot.elephant.behavior.QuitBehavior;
 import org.lejos.ev3.robot.elephant.behavior.TrumpBehavior;
 import org.lejos.ev3.robot.elephant.behavior.WalkBehavior;
-import org.lejos.ev3.robot.elephant.thread.TouchSensorThread;
+import org.lejos.ev3.robot.elephant.sensor.TouchSensor;
 
 public class Elephant {
 	
 	static EV3LargeRegulatedMotor mainMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("A"));
-	static EV3LargeRegulatedMotor trumpMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("C"));
-	static TouchSensorThread headTouchsensor;
+	static EV3LargeRegulatedMotor trumpMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("B"));
+	static TouchSensor headTouchsensor;
 
 	public static void introMessage() {
 
@@ -28,8 +28,8 @@ public class Elephant {
 		g.setFont(Font.getSmallFont());
 		g.drawString("Requires : ", 2, 20, 0);
 		g.drawString(" A - Legs motor", 2, 30, 0);
-		g.drawString(" B - Head motor", 2, 40, 0);
-		g.drawString(" C - Trump motor", 2, 50, 0);
+		g.drawString(" D - Head motor", 2, 40, 0);
+		g.drawString(" B - Trump motor", 2, 50, 0);
 		g.drawString(" 1 - Trump sensor", 2, 60, 0);
 		g.drawString("Actions : ", 2, 70, 0);
 		g.drawString(" Enter - Walk", 2, 80, 0);
@@ -72,9 +72,7 @@ public class Elephant {
 		mainMotor.setAcceleration(0);
 		mainMotor.setSpeed(0);
 		
-		headTouchsensor = new TouchSensorThread(SensorPort.S1);
-		headTouchsensor.setDaemon(true);
-		headTouchsensor.start();
+		headTouchsensor = new TouchSensor(SensorPort.S1);
 		Behavior b1 = new WalkBehavior(mainMotor);
 		Behavior b2 = new TrumpBehavior(trumpMotor, headTouchsensor);
 		Behavior b3 = new QuitBehavior();

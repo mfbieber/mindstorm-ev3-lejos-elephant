@@ -10,7 +10,7 @@ public class WalkBehavior  implements Behavior {
 	public int iteration = 1;
 	public int takospeed = 0;
 	public int speed = 300;
-	public boolean run = true;
+	public boolean run = false;
 
 	public EV3LargeRegulatedMotor motor;
 	

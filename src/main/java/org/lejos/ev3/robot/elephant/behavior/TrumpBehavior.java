@@ -5,7 +5,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.subsumption.Behavior;
 import lejos.utility.Delay;
 
-import org.lejos.ev3.robot.elephant.thread.TouchSensorThread;
+import org.lejos.ev3.robot.elephant.sensor.TouchSensor;
 
 public class TrumpBehavior implements Behavior {
 	public static boolean up = true;
@@ -14,9 +14,9 @@ public class TrumpBehavior implements Behavior {
 	public static int currentRotation = 0;
 
 	public EV3LargeRegulatedMotor motor;
-	public TouchSensorThread touchsensor;
+	public TouchSensor touchsensor;
 	
-	public TrumpBehavior(EV3LargeRegulatedMotor motor, TouchSensorThread touchsensor) {
+	public TrumpBehavior(EV3LargeRegulatedMotor motor, TouchSensor touchsensor) {
 		this.motor = motor;
 		this.touchsensor = touchsensor;
 	}
@@ -41,12 +41,11 @@ public class TrumpBehavior implements Behavior {
 			this.motor.rotate(getDirection() * fullMoveRotation, true);
 			if (up) {
 				while (run) {
-					if (this.touchsensor.push) {
-						this.motor.stop();
-						currentRotation = 0;
-						up = false;
-						run = false;
-					}
+					this.touchsensor.waitForPush();
+					this.motor.stop();
+					currentRotation = 0;
+					up = false;
+					run = false;
 				}
 			} else {
 				up = true;
