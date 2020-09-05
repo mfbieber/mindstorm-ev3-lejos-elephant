@@ -86,6 +86,6 @@ public class Elephant {
 		Arbitrator arbitrator = new Arbitrator(behaviorList);
 		Button.LEDPattern(6);
 		Button.waitForAnyPress();
-		arbitrator.start();
+		arbitrator.go();
 	}
 }

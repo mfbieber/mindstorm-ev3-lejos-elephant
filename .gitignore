@@ -26,3 +26,12 @@
 /.gradle/buildOutputCleanup/outputFiles.bin
 /.gradle/checksums/sha1-checksums.bin
 /.idea/vcs.xml
+/.gradle/6.5/javaCompile/classAnalysis.bin
+/build/classes/java/main/org/lejos/ev3/robot/elephant/Elephant.class
+/.gradle/6.5/javaCompile/javaCompile.lock
+/build/classes/java/main/org/lejos/ev3/robot/elephant/behavior/QuitBehavior.class
+/build/tmp/compileJava/source-classes-mapping.txt
+/.gradle/6.5/javaCompile/taskHistory.bin
+/build/classes/java/main/org/lejos/ev3/robot/elephant/thread/TouchSensorThread.class
+/build/classes/java/main/org/lejos/ev3/robot/elephant/behavior/TrumpBehavior.class
+/build/classes/java/main/org/lejos/ev3/robot/elephant/behavior/WalkBehavior.class
