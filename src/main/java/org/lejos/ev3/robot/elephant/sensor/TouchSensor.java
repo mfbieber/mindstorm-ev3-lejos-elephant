@@ -15,14 +15,12 @@ public class TouchSensor {
 	}
 
 	public void waitForPush() {
-		boolean pushed = false;
-		while (!pushed) {
-			pushed = isPushed();
-			if (!pushed) {
-				continue;
-			}
-			System.out.println("touched");
+		//noinspection StatementWithEmptyBody
+		while (!isPushed()) {
+			//waiting for sensor to be touched
 		}
+		System.out.println("touched");
+
 	}
 
 	public boolean isPushed() {
