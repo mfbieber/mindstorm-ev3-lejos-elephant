@@ -1,3 +1,7 @@
+#F4nt0r
+
+This project was forked from: https://github.com/draganshadow/mindstorm-ev3-lejos-elephant
+
 mindstorm-ev3-lejos-elephant
 ============================
 
