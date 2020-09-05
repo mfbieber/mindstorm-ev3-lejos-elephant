@@ -10,6 +10,7 @@ import lejos.hardware.port.SensorPort;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
+import org.lejos.ev3.robot.elephant.behavior.KeepControlDecorator;
 import org.lejos.ev3.robot.elephant.behavior.QuitBehavior;
 import org.lejos.ev3.robot.elephant.behavior.TrumpBehavior;
 import org.lejos.ev3.robot.elephant.behavior.WalkBehavior;
@@ -74,7 +75,7 @@ public class Elephant {
 		
 		headTouchsensor = new TouchSensor(SensorPort.S1);
 		Behavior b1 = new WalkBehavior(mainMotor);
-		Behavior b2 = new TrumpBehavior(trumpMotor, headTouchsensor);
+		Behavior b2 = new KeepControlDecorator(new TrumpBehavior(trumpMotor, headTouchsensor));
 		Behavior b3 = new QuitBehavior();
 		Behavior[] behaviorList = { 
 				b1,

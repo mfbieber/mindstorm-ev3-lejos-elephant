@@ -6,11 +6,10 @@ import lejos.hardware.sensor.SensorMode;
 
 public class TouchSensor {
 
-	private final EV3TouchSensor sensor;
 	private final SensorMode sensorSampleProvider;
 
 	public TouchSensor(Port p) {
-		sensor = new EV3TouchSensor(p);
+		EV3TouchSensor sensor = new EV3TouchSensor(p);
 		sensorSampleProvider = sensor.getTouchMode();
 	}
 
