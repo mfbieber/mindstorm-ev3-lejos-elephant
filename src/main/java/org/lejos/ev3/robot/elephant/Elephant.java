@@ -10,36 +10,38 @@ import lejos.hardware.port.SensorPort;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
-import org.lejos.ev3.robot.elephant.behavior.KeepControlDecorator;
-import org.lejos.ev3.robot.elephant.behavior.QuitBehavior;
-import org.lejos.ev3.robot.elephant.behavior.TrumpBehavior;
-import org.lejos.ev3.robot.elephant.behavior.WalkBehavior;
+import org.lejos.ev3.robot.elephant.behavior.*;
+import org.lejos.ev3.robot.elephant.sensor.ColorSensor;
 import org.lejos.ev3.robot.elephant.sensor.TouchSensor;
 
 public class Elephant {
 	
 	static EV3LargeRegulatedMotor mainMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("A"));
 	static EV3LargeRegulatedMotor trumpMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("B"));
-	static TouchSensor headTouchsensor;
+	static EV3LargeRegulatedMotor headMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("D"));
+	static TouchSensor trumpTouchSensor;
+	static ColorSensor headColorSensor;
 
 	public static void introMessage() {
 
 		GraphicsLCD g = LocalEV3.get().getGraphicsLCD();
-		g.drawString("Elephant", 5, 0, 0);
 		g.setFont(Font.getSmallFont());
-		g.drawString("Requires : ", 2, 20, 0);
-		g.drawString(" A - Legs motor", 2, 30, 0);
+		g.drawString("Elephant", 2, 0, 0);
+		g.drawString("Requires : ", 2, 10, 0);
+		g.drawString(" A - Legs motor", 2, 20, 0);
+		g.drawString(" B - Trump motor", 2, 30, 0);
 		g.drawString(" D - Head motor", 2, 40, 0);
-		g.drawString(" B - Trump motor", 2, 50, 0);
-		g.drawString(" 1 - Trump sensor", 2, 60, 0);
+		g.drawString(" 1 - Trump sensor", 2, 50, 0);
+		g.drawString(" 4 - Head sensor", 2, 60, 0);
 		g.drawString("Actions : ", 2, 70, 0);
 		g.drawString(" Enter - Walk", 2, 80, 0);
 		g.drawString(" Up - Toggle Trump", 2, 90, 0);
+		g.drawString(" Down - Toggle Head", 2, 100, 0);
 
 		// Quit GUI button:
 		g.setFont(Font.getSmallFont()); // can also get specific size using
 										// Font.getFont()
-		int y_quit = 100;
+		int y_quit = 110;
 		int width_quit = 45;
 		int height_quit = width_quit / 2;
 		int arc_diam = 6;
@@ -73,15 +75,15 @@ public class Elephant {
 		mainMotor.setAcceleration(0);
 		mainMotor.setSpeed(0);
 		
-		headTouchsensor = new TouchSensor(SensorPort.S1);
+		trumpTouchSensor = new TouchSensor(SensorPort.S1);
+		headColorSensor = new ColorSensor(SensorPort.S4);
+
 		Behavior b1 = new WalkBehavior(mainMotor);
-		Behavior b2 = new KeepControlDecorator(new TrumpBehavior(trumpMotor, headTouchsensor));
-		Behavior b3 = new QuitBehavior();
-		Behavior[] behaviorList = { 
-				b1,
-				b2,
-					b3
-				};
+		Behavior b2 = new KeepControlDecorator(new TrumpBehavior(trumpMotor, trumpTouchSensor));
+		Behavior b3 = new KeepControlDecorator(new HeadBehavior(headMotor, headColorSensor));
+		Behavior b4 = new QuitBehavior();
+		Behavior[] behaviorList = { b1, b2, b3, b4 };
+
 		Arbitrator arbitrator = new Arbitrator(behaviorList);
 		Button.LEDPattern(6);
 		Button.waitForAnyPress();

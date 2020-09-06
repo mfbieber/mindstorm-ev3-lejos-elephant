@@ -19,7 +19,6 @@ public class TouchSensor {
 			//waiting for sensor to be touched
 		}
 		System.out.println("touched");
-
 	}
 
 	public boolean isPushed() {
