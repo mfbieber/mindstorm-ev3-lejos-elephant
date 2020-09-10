@@ -4,6 +4,8 @@ import lejos.hardware.Button;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.subsumption.Behavior;
 import lejos.utility.Delay;
+import org.lejos.ev3.robot.elephant.Command;
+import org.lejos.ev3.robot.elephant.sensor.IRSensor;
 
 public class WalkBehavior  implements Behavior {
 	
@@ -13,15 +15,19 @@ public class WalkBehavior  implements Behavior {
 	public boolean run = false;
 
 	public EV3LargeRegulatedMotor motor;
-	
-	public WalkBehavior(EV3LargeRegulatedMotor motor) {
+	private final IRSensor irSensor;
+
+	public WalkBehavior(EV3LargeRegulatedMotor motor, IRSensor irSensor) {
 		this.motor = motor;
+		this.irSensor = irSensor;
 	}
 	
 	public boolean takeControl() {
-		if (!run)
-		{
-			run = (Button.readButtons() == Button.ID_ENTER);
+		if (!run) {
+			run = (Button.readButtons() == Button.ID_ENTER || irSensor.nextCommand().equals(Command.WALK));
+		}
+		if (irSensor.nextCommand().equals(Command.STOP)) {
+			run = false;
 		}
 		return run;
 	}
@@ -43,6 +49,7 @@ public class WalkBehavior  implements Behavior {
 			Delay.msDelay(1000);
 			Thread.yield(); // don't exit till suppressed
 		}
+		motor.stop();
 	}
 
 }

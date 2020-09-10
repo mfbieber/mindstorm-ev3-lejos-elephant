@@ -3,22 +3,27 @@ package org.lejos.ev3.robot.elephant.behavior;
 import lejos.hardware.Button;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.subsumption.Behavior;
+import org.lejos.ev3.robot.elephant.Command;
 import org.lejos.ev3.robot.elephant.sensor.ColorSensor;
+import org.lejos.ev3.robot.elephant.sensor.IRSensor;
 
 public class HeadBehavior implements Behavior {
 
     private final EV3LargeRegulatedMotor headMotor;
     private final ColorSensor headColorSensor;
+    private final IRSensor irSensor;
 
-    public HeadBehavior(EV3LargeRegulatedMotor headMotor, ColorSensor headColorSensor) {
+    public HeadBehavior(EV3LargeRegulatedMotor headMotor, ColorSensor headColorSensor,
+                        IRSensor irSensor) {
         this.headMotor = headMotor;
         this.headColorSensor = headColorSensor;
+        this.irSensor = irSensor;
     }
 
     @Override
     public boolean takeControl() {
         int button = Button.readButtons();
-        return button == Button.ID_DOWN;
+        return (button == Button.ID_DOWN || irSensor.nextCommand().equals(Command.HEAD));
     }
 
     @Override

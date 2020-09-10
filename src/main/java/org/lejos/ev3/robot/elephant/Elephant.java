@@ -12,6 +12,7 @@ import lejos.robotics.subsumption.Behavior;
 
 import org.lejos.ev3.robot.elephant.behavior.*;
 import org.lejos.ev3.robot.elephant.sensor.ColorSensor;
+import org.lejos.ev3.robot.elephant.sensor.IRSensor;
 import org.lejos.ev3.robot.elephant.sensor.TouchSensor;
 
 public class Elephant {
@@ -21,6 +22,7 @@ public class Elephant {
 	static EV3LargeRegulatedMotor headMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("D"));
 	static TouchSensor trumpTouchSensor;
 	static ColorSensor headColorSensor;
+	static IRSensor irSensor;
 
 	public static void introMessage() {
 
@@ -77,10 +79,11 @@ public class Elephant {
 		
 		trumpTouchSensor = new TouchSensor(SensorPort.S1);
 		headColorSensor = new ColorSensor(SensorPort.S4);
+		irSensor = new IRSensor(SensorPort.S3);
 
-		Behavior b1 = new WalkBehavior(mainMotor);
-		Behavior b2 = new KeepControlDecorator(new TrumpBehavior(trumpMotor, trumpTouchSensor));
-		Behavior b3 = new KeepControlDecorator(new HeadBehavior(headMotor, headColorSensor));
+		Behavior b1 = new KeepControlDecorator(new WalkBehavior(mainMotor, irSensor));
+		Behavior b2 = new KeepControlDecorator(new TrumpBehavior(trumpMotor, trumpTouchSensor, irSensor));
+		Behavior b3 = new KeepControlDecorator(new HeadBehavior(headMotor, headColorSensor, irSensor));
 		Behavior b4 = new QuitBehavior();
 		Behavior[] behaviorList = { b1, b2, b3, b4 };
 
