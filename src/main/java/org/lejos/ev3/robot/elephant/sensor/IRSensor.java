@@ -2,7 +2,6 @@ package org.lejos.ev3.robot.elephant.sensor;
 
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3IRSensor;
-import org.lejos.ev3.robot.elephant.Command;
 
 public class IRSensor {
 

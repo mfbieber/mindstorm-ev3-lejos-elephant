@@ -1,4 +1,4 @@
-package org.lejos.ev3.robot.elephant;
+package org.lejos.ev3.robot.elephant.sensor;
 
 import java.util.Arrays;
 

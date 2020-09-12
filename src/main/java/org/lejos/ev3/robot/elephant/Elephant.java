@@ -9,23 +9,52 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.SensorPort;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
-
 import org.lejos.ev3.robot.elephant.behavior.*;
+import org.lejos.ev3.robot.elephant.event.*;
 import org.lejos.ev3.robot.elephant.sensor.ColorSensor;
 import org.lejos.ev3.robot.elephant.sensor.IRSensor;
 import org.lejos.ev3.robot.elephant.sensor.TouchSensor;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Elephant {
-	
-	static EV3LargeRegulatedMotor mainMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("A"));
-	static EV3LargeRegulatedMotor trumpMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("B"));
-	static EV3LargeRegulatedMotor headMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("D"));
-	static TouchSensor trumpTouchSensor;
-	static ColorSensor headColorSensor;
-	static IRSensor irSensor;
 
-	public static void introMessage() {
+	public static void main(String[] args) {
 
+		EV3LargeRegulatedMotor mainMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("A"));
+		EV3LargeRegulatedMotor trumpMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("B"));
+		EV3LargeRegulatedMotor headMotor = new EV3LargeRegulatedMotor(BrickFinder.getDefault().getPort("D"));
+
+		introMessage();
+		mainMotor.resetTachoCount();
+		mainMotor.rotateTo(0);
+		mainMotor.setAcceleration(0);
+		mainMotor.setSpeed(0);
+
+		TouchSensor trumpTouchSensor = new TouchSensor(SensorPort.S1);
+		ColorSensor headColorSensor = new ColorSensor(SensorPort.S4);
+		IRSensor irSensor = new IRSensor(SensorPort.S3);
+
+		Dispatcher<SensorEvent> dispatcher = new Dispatcher<>();
+
+		ExecutorService executorService = Executors.newFixedThreadPool(3);
+		executorService.submit(new ColorChangeEventProducer(headColorSensor, dispatcher));
+		executorService.submit(new RemoteButtonPressEventProducer(irSensor, dispatcher));
+		executorService.submit(new TouchButtonPressEventProducer(trumpTouchSensor, dispatcher));
+
+		Behavior b1 = new KeepControlDecorator(new WalkBehavior(mainMotor, dispatcher));
+		Behavior b2 = new KeepControlDecorator(new TrumpBehavior(trumpMotor, dispatcher));
+		Behavior b3 = new KeepControlDecorator(new HeadBehavior(headMotor, dispatcher));
+		Behavior b4 = new QuitBehavior();
+		Behavior[] behaviorList = { b1, b2, b3, b4 };
+
+		Arbitrator arbitrator = new Arbitrator(behaviorList);
+		Button.LEDPattern(6);
+		arbitrator.go();
+	}
+
+	private static void introMessage() {
 		GraphicsLCD g = LocalEV3.get().getGraphicsLCD();
 		g.setFont(Font.getSmallFont());
 		g.drawString("Elephant", 2, 0, 0);
@@ -42,7 +71,7 @@ public class Elephant {
 
 		// Quit GUI button:
 		g.setFont(Font.getSmallFont()); // can also get specific size using
-										// Font.getFont()
+		// Font.getFont()
 		int y_quit = 110;
 		int width_quit = 45;
 		int height_quit = width_quit / 2;
@@ -50,9 +79,9 @@ public class Elephant {
 		g.drawString("QUIT", 9, y_quit + 7, 0);
 		g.drawLine(0, y_quit, 45, y_quit); // top line
 		g.drawLine(0, y_quit, 0, y_quit + height_quit - arc_diam / 2); // left
-																		// line
+		// line
 		g.drawLine(width_quit, y_quit, width_quit, y_quit + height_quit / 2); // right
-																				// line
+		// line
 		g.drawLine(0 + arc_diam / 2, y_quit + height_quit, width_quit - 10,
 				y_quit + height_quit); // bottom line
 		g.drawLine(width_quit - 10, y_quit + height_quit, width_quit, y_quit
@@ -70,26 +99,4 @@ public class Elephant {
 		g.clear();
 	}
 
-	public static void main(String[] args) {
-		introMessage();
-		mainMotor.resetTachoCount();
-		mainMotor.rotateTo(0);
-		mainMotor.setAcceleration(0);
-		mainMotor.setSpeed(0);
-		
-		trumpTouchSensor = new TouchSensor(SensorPort.S1);
-		headColorSensor = new ColorSensor(SensorPort.S4);
-		irSensor = new IRSensor(SensorPort.S3);
-
-		Behavior b1 = new KeepControlDecorator(new WalkBehavior(mainMotor, irSensor));
-		Behavior b2 = new KeepControlDecorator(new TrumpBehavior(trumpMotor, trumpTouchSensor, irSensor));
-		Behavior b3 = new KeepControlDecorator(new HeadBehavior(headMotor, headColorSensor, irSensor));
-		Behavior b4 = new QuitBehavior();
-		Behavior[] behaviorList = { b1, b2, b3, b4 };
-
-		Arbitrator arbitrator = new Arbitrator(behaviorList);
-		Button.LEDPattern(6);
-		Button.waitForAnyPress();
-		arbitrator.go();
-	}
 }

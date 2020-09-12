@@ -4,52 +4,59 @@ import lejos.hardware.Button;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.subsumption.Behavior;
 import lejos.utility.Delay;
-import org.lejos.ev3.robot.elephant.Command;
+import org.lejos.ev3.robot.elephant.event.Dispatcher;
+import org.lejos.ev3.robot.elephant.event.RemoteButtonPressedEvent;
+import org.lejos.ev3.robot.elephant.event.SensorEvent;
+import org.lejos.ev3.robot.elephant.sensor.Command;
 import org.lejos.ev3.robot.elephant.sensor.IRSensor;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WalkBehavior  implements Behavior {
 	
-	public int iteration = 1;
-	public int takospeed = 0;
-	public int speed = 300;
-	public boolean run = false;
+	public AtomicBoolean run = new AtomicBoolean(false);
 
 	public EV3LargeRegulatedMotor motor;
-	private final IRSensor irSensor;
 
-	public WalkBehavior(EV3LargeRegulatedMotor motor, IRSensor irSensor) {
+	public WalkBehavior(EV3LargeRegulatedMotor motor, Dispatcher<SensorEvent> dispatcher) {
 		this.motor = motor;
-		this.irSensor = irSensor;
+		dispatcher.listen(RemoteButtonPressedEvent.class, this::buttonPressed);
 	}
-	
+
+	private void buttonPressed(SensorEvent event) {
+		if (event instanceof RemoteButtonPressedEvent &&
+				((RemoteButtonPressedEvent) event).getCommand().equals(Command.WALK)
+		) {
+			run.set(true);
+			return;
+		} else if (event instanceof RemoteButtonPressedEvent &&
+				((RemoteButtonPressedEvent) event).getCommand().equals(Command.STOP)
+		) {
+			motor.stop();
+			run.set(false);
+			return;
+		}
+		run.set(false);
+	}
+
+	@Override
 	public boolean takeControl() {
-		if (!run) {
-			run = (Button.readButtons() == Button.ID_ENTER || irSensor.nextCommand().equals(Command.WALK));
-		}
-		if (irSensor.nextCommand().equals(Command.STOP)) {
-			run = false;
-		}
-		return run;
+		return (Button.readButtons() == Button.ID_ENTER || run.get());
 	}
 
+	@Override
 	public void suppress() {
-		run = false;// standard practice for suppress methods
+		//nothing to do here
 	}
 
+	@Override
 	public void action() {
 		Button.LEDPattern(6);
 		Button.discardEvents();
 		motor.setAcceleration(100);
 		System.out.println("Walk");
-		while (run) {
-			motor.setSpeed(speed);
-			motor.backward();
-			iteration++;
-			takospeed = motor.getSpeed();
-			Delay.msDelay(1000);
-			Thread.yield(); // don't exit till suppressed
-		}
-		motor.stop();
+		motor.setSpeed(300);
+		motor.backward();
 	}
 
 }

@@ -13,14 +13,6 @@ public class TouchSensor {
 		sensorSampleProvider = sensor.getTouchMode();
 	}
 
-	public void waitForPush() {
-		//noinspection StatementWithEmptyBody
-		while (!isPushed()) {
-			//waiting for sensor to be touched
-		}
-		System.out.println("touched");
-	}
-
 	public boolean isPushed() {
 		float[] sample = new float[sensorSampleProvider.sampleSize()];
 		sensorSampleProvider.fetchSample(sample, 0);
