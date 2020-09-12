@@ -10,7 +10,7 @@ public class ColorSensor {
 
     public ColorSensor(Port port) {
         EV3ColorSensor colorSensor = new EV3ColorSensor(port);
-        sensorSampleProvider = colorSensor.getRedMode();
+        sensorSampleProvider = colorSensor.getRedMode(); //TODO: maybe this is even not the proper mode
     }
 
     /**
@@ -20,6 +20,6 @@ public class ColorSensor {
     public boolean isRed() {
         float[] sample = new float[sensorSampleProvider.sampleSize()];
         sensorSampleProvider.fetchSample(sample, 0);
-        return sample[0] > 0.05; //TODO: find proper threshold value
+        return sample[0] > 0.03; //TODO: find proper threshold value
     }
 }
